@@ -1,5 +1,5 @@
-from model import SalesModel
-from view import SalesView
+from models.model import SalesModel
+from views.view import SalesView
 import customtkinter as ctk
 
 class SalesController:
@@ -18,12 +18,12 @@ class SalesController:
             return
 
         try:
-            float(data["amount"])
+            sale_amount = float(data["amount"])
         except ValueError:
             self.view.update_status("Amount must be a number.", "red")
             return
 
-        self.model.record_sale(data["barber"], data["customer"], data["amount"])
+        self.model.record_sale(data["barber"], data["customer"], sale_amount)
         self.view.update_status(f"Sale recorded for {data['customer']}.", "green")
         self.view.clear_inputs()
 
@@ -35,4 +35,11 @@ class SalesController:
             login_window.destroy()
             self.view.show_sales_log(self.model.get_sales_log())
         else:
-            ctk.CTkLabel(login_window, text="Invalid credentials", text_color="red").pack()
+            # Update (or create) error label for failed login
+            error_label = getattr(login_window, 'error_label', None)
+            if error_label is None:
+                error_label = ctk.CTkLabel(login_window, text="Invalid credentials", text_color="red")
+                error_label.pack(pady=5)
+                setattr(login_window, 'error_label', error_label)
+            else:
+                error_label.configure(text="Invalid credentials")

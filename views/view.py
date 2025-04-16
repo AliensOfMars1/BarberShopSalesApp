@@ -11,8 +11,8 @@ class SalesView(ctk.CTk):
 
         ctk.CTkLabel(self, text="Barbershop Sales", font=("Arial", 20, "bold")).pack(pady=10)
 
-        self.barber_dropdown = ctk.CTkOptionMenu(self, values=controller.get_barbers())
-        self.barber_dropdown.set(controller.get_barbers()[0])
+        # Initialize with a temporary value; will be updated later
+        self.barber_dropdown = ctk.CTkOptionMenu(self, values=["Loading..."])
         self.barber_dropdown.pack(pady=10)
 
         self.customer_entry = ctk.CTkEntry(self, placeholder_text="Customer Name")
@@ -26,6 +26,41 @@ class SalesView(ctk.CTk):
 
         ctk.CTkButton(self, text="Record Sale", command=self.controller.record_sale).pack(pady=10)
         ctk.CTkButton(self, text="Admin Login", command=self.controller.open_admin_login).pack(pady=20)
+        open_btn = ctk.CTkButton(self, text="Open Toplevel", command=self.open_toplevel)
+        open_btn.pack(pady=20)
+
+        # For the loading animation (if needed)
+        self.loading_dots = [".", "..", "..."]
+        self.loading = False
+        self.loading_index = 0
+
+        # Immediately show the Barber Setup window after the main window is ready
+        self.after(0, self.show_barber_setup)
+
+    def show_barber_setup(self):
+        setup_window = ctk.CTkToplevel(self)
+        setup_window.title("Setup Barbers")
+        setup_window.geometry("400x300")
+        setup_window.grab_set()  # Make it modal
+
+        ctk.CTkLabel(setup_window, text="Enter Barber Names (comma separated)", font=("Arial", 14)).pack(pady=10)
+        barber_entry = ctk.CTkEntry(setup_window, width=300, placeholder_text="e.g., Mike, Alex, Sasha")
+        barber_entry.pack(pady=10)
+
+        def on_proceed():
+            raw_text = barber_entry.get()
+            # Split by comma and remove any surrounding whitespace
+            barber_list = [name.strip() for name in raw_text.split(",") if name.strip()]
+            if barber_list:
+                # Update the model's barber list and refresh the dropdown
+                self.controller.model.barbers = barber_list
+                self.barber_dropdown.configure(values=barber_list)
+                self.barber_dropdown.set(barber_list[0])
+                setup_window.destroy()
+            else:
+                messagebox.showerror("Error", "Please enter at least one barber name.")
+
+        ctk.CTkButton(setup_window, text="Proceed", command=on_proceed).pack(pady=20)
 
     def get_sale_input(self):
         return {
@@ -40,7 +75,6 @@ class SalesView(ctk.CTk):
 
     def update_status(self, message, color="green"):
         self.status_label.configure(text=message, text_color=color)
-
 
     def show_sales_log(self, sales_log):
         log_window = ctk.CTkToplevel(self)
@@ -75,15 +109,23 @@ class SalesView(ctk.CTk):
 
         ctk.CTkButton(login_window, text="Login", command=attempt_login).pack(pady=10)
 
-    def toggle_theme(self):
-        current_mode = ctk.get_appearance_mode()  # Get current mode ("Light" or "Dark" or "System")
-        # Toggle to the opposite theme (ignoring "System" for simplicity)
-        if current_mode == "Dark":
-            new_mode = "Light"
-        else:
-            new_mode = "Dark"
-        ctk.set_appearance_mode(new_mode)
-        messagebox.showinfo("THEME",f"Theme switched to {new_mode} Mode")      
+    def open_toplevel(self):
+        toplevel = ctk.CTkToplevel(self)
+        toplevel.title("3 Divisions - Vertical")
+        toplevel.geometry("400x300")
+
+        # 3 vertically stacked frames
+        frame1 = ctk.CTkFrame(toplevel, fg_color="transparent", height=100, border_width=2, border_color="#444")
+        frame2 = ctk.CTkFrame(toplevel, fg_color="transparent", height=100, border_width=2, border_color="#444")
+        frame3 = ctk.CTkFrame(toplevel, fg_color="transparent", height=100, border_width=2, border_color="#444")
+
+        frame1.pack(side='left', fill='y', expand=True)
+        frame2.pack(side='left', fill='y', expand=True)
+        frame3.pack(side='left', fill='y', expand=True)
+
+        ctk.CTkLabel(frame1, text=" Division 1").pack(pady=10)
+        ctk.CTkLabel(frame2, text=" Division 2").pack(pady=10)
+        ctk.CTkLabel(frame3, text=" Division 3").pack(pady=10)
 
     # Loading Animation Methods ----
     def start_loading_animation(self):
@@ -93,9 +135,9 @@ class SalesView(ctk.CTk):
 
     def animate_loading(self):
         if self.loading:
-            self.update_display(f"Loading{self.loading_dots[self.loading_index]}")
+            self.update_status(f"Loading{self.loading_dots[self.loading_index]}")
             self.loading_index = (self.loading_index + 1) % len(self.loading_dots)
             self.after(500, self.animate_loading)
 
     def stop_loading_animation(self):
-        self.loading = False                
+        self.loading = False

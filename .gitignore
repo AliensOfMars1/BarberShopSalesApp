@@ -8,6 +8,7 @@ env/
 venv/
 ENV/
 .venv/
+new_vnev/
 
 # Ignore distribution and packaging directories
 build/
