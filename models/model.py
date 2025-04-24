@@ -19,3 +19,7 @@ class SalesModel:
 
     def get_sales_log(self):
         return self.sales_log
+    
+    def verify_admin(self, username, password):
+        # Hardcoded credentials for now; you could also read from a secure config
+        return username == "admin" and password == "@1234"
