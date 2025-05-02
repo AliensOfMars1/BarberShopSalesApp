@@ -147,3 +147,7 @@ class SalesController:
         # Update model and view with new barber names
         self.barber_names = barber_names
         self.frame.update_barber_names(barber_names)
+
+
+    
+    

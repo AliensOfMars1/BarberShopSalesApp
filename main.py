@@ -17,6 +17,7 @@ if __name__ == "__main__":
     if os.path.exists(CONSTS.BARBER_TXT):
         root.geometry("800x400+500+200")  # Larger size for sales UI
         root.resizable(True, True)
+        root.minsize(750, 320)
         # Load existing barbers
         with open(CONSTS.BARBER_TXT, "r", encoding="utf-8") as f:
             barbers = [line.strip() for line in f if line.strip()]
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     else:
         # First run: go through setup
         root.geometry("570x320+500+200")  # Compact size for setup UI
-        root.resizable(False, False)
+        root.resizable(False, False),    
         SetupController(root)
 
     root.mainloop()

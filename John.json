@@ -1,0 +1,32 @@
+[
+  {
+    "barber": "John",
+    "service": "Beard Trim",
+    "amount": 45.0,
+    "time": "2025-05-01 20:29:10"
+  },
+  {
+    "barber": "John",
+    "service": "Beard Trim",
+    "amount": 56.0,
+    "time": "2025-05-01 22:33:11"
+  },
+  {
+    "barber": "John",
+    "service": "Haircut & Dye",
+    "amount": 67.0,
+    "time": "2025-05-02 09:47:07"
+  },
+  {
+    "barber": "John",
+    "service": "Simple Adult Cut",
+    "amount": 67.0,
+    "time": "2025-05-02 13:45:31"
+  },
+  {
+    "barber": "John",
+    "service": "Beard Trim",
+    "amount": 10.0,
+    "time": "2025-05-02 17:14:43"
+  }
+]
