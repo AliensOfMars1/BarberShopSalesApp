@@ -696,7 +696,7 @@ class SalesView(ctk.CTkFrame):
         expense_summary, total_expense = self.generate_expense_summary()
         lines.append("_________________________________________________________________________")
         lines.append("")
-        lines.append("Total Expenses:")
+        lines.append("All Expenses:")
         lines.append("")
         lines.append(expense_summary)
         lines.append("")
