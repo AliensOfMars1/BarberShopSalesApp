@@ -1,7 +1,8 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
 import os
-
+from customtkinter import CTkImage
+from PIL import Image
 
 class SetupView(ctk.CTkFrame):
     def __init__(self, master, proceed_callback):
@@ -12,10 +13,11 @@ class SetupView(ctk.CTkFrame):
         # Background image overlay
         bg_path = os.path.join(os.path.dirname(__file__), "setup_bg.png")
         if os.path.exists(bg_path):
-            img = Image.open(bg_path)
-            self.bg_image = ImageTk.PhotoImage(img)
-            bg_label = ctk.CTkLabel(self, image=self.bg_image, text="")
+            img = CTkImage(Image.open(bg_path))
+            bg_label = ctk.CTkLabel(self, image=img, text="")
             bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+            self.bg_image = img  # keep a reference so it doesn’t get garbage‑collected
+
   
         # Title inside rounded frame
         title_frame = ctk.CTkFrame(self, fg_color="#333333", corner_radius=0)

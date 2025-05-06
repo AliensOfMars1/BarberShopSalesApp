@@ -2,7 +2,7 @@ from datetime import datetime
 
 class SalesModel:
     def __init__(self):
-        self.barbers = ["Mike", "Alex", "Sasha", "Jordan"]
+        self.barbers = []
         self.sales_log = []
         self.admin_credentials = {"sporky": "1234"}
 

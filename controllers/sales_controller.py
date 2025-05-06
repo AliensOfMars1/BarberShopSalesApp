@@ -7,7 +7,13 @@ from a_consts import CONSTS
 import os , json, sys
 from datetime import datetime
 import tkinter as tk
-from tkinter import simpledialog
+from reportlab.pdfgen import canvas
+from tkinter import filedialog
+import os, json
+from tkinter import messagebox, simpledialog
+from reportlab.lib.pagesizes import LETTER
+
+
 
 class SalesController:
     def __init__(self, root, barber_names):
@@ -22,7 +28,10 @@ class SalesController:
             barber_names,
             record_callback=self.record_sale,
             view_history_callback=self.view_history,
-            reset_callback=self.reset_app
+            reset_callback=self.reset_app,
+            export_callback=self.export,
+            view_expenses_callback=self.view_expenses,
+            view_sales_callback = self.view_sales
         )
         self.frame.pack(fill="both", expand=True)
 
@@ -142,8 +151,27 @@ class SalesController:
         self.frame.destroy()
         self.root.destroy()
 
+    def export(self):
+        # delegate straight back to the view’s export code
+        self.frame.export()
+
+    def view_expenses(self):
+        # Open the expenses window
+        self.frame.on_view_expense()  
+      
+    def view_sales(self):
+        # Open the sales window
+        self.frame.view_sales()
 
     def update_barber_names(self, barber_names):
         # Update model and view with new barber names
         self.barber_names = barber_names
         self.frame.update_barber_names(barber_names)
+
+
+
+      
+
+
+    
+    
