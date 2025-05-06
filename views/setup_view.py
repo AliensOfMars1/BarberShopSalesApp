@@ -9,9 +9,9 @@ class SetupView(ctk.CTkFrame):
         self.proceed_callback = proceed_callback
         self.configure(fg_color="#222222")
 
-        # ───── Left: full‑height image covers 60% width ─────
+        # ───── Left: full‑height image covers 50% width ─────
         img_frame = ctk.CTkFrame(self, fg_color="transparent")
-        img_frame.place(relx=0, rely=0, relwidth=0.6, relheight=1)
+        img_frame.place(relx=0, rely=0, relwidth=0.5, relheight=1)
         img_frame.pack_propagate(False)
 
         bg_path = os.path.join(os.path.dirname(__file__), "view_images", "login_bg.png")
@@ -27,10 +27,9 @@ class SetupView(ctk.CTkFrame):
                 lbl.configure(image=self.left_img)
             img_frame.bind("<Configure>", resize)
 
-        # ───── Right: form in remaining 40% ─────
-        form = ctk.CTkFrame(self, fg_color="transparent")
+        # ───── Right: form in remaining 50% ─────
         form = ctk.CTkFrame(self, fg_color="#334A6E", corner_radius=0)
-        form.place(relx=0.6, rely=0, relwidth=0.4, relheight=1)
+        form.place(relx=0.5, rely=0, relwidth=0.5, relheight=1)
         form.lift()
 
         # Barber names
@@ -40,15 +39,15 @@ class SetupView(ctk.CTkFrame):
             font=ctk.CTkFont(size=18, weight="bold"),
             text_color="white",
             justify="left"
-        ).pack(anchor="w", pady=(60,20), padx=20)
+        ).pack(anchor="w", pady=(80, 16), padx=75)
 
         self.entry = ctk.CTkEntry(
             form,
             placeholder_text="e.g., Mike, Alex, Sasha",
             fg_color="#333333", text_color="white",
-            width=240, corner_radius=8
+            width=240,height=40 , corner_radius=8
         )
-        self.entry.pack(anchor="w", pady=(0,30), padx=20)
+        self.entry.pack(anchor="w", pady=(0,30), padx=70)
 
         # Proceed button
         self.proceed_btn = ctk.CTkButton(
@@ -60,7 +59,7 @@ class SetupView(ctk.CTkFrame):
             fg_color="#4CAF50", hover_color="#45a049",
             font=ctk.CTkFont(size=16, weight="bold")
         )
-        self.proceed_btn.pack(anchor="w", padx=40)
+        self.proceed_btn.pack(anchor="w", padx=95)
 
     def on_proceed(self):
         names = [n.strip() for n in self.entry.get().split(",") if n.strip()]

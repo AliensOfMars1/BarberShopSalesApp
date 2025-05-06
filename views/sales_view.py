@@ -85,7 +85,8 @@ class SalesView(ctk.CTkFrame):
         sep.pack(fill="x", pady=(0,10), padx=20)
 
         # Buttons
-        for text, color in [("History","#E0E0E0"), ("Export","#F1C40F"), ("Reset App","#E74C3C"),("View Sales","#5DADE2"), ("View Expense","#1ABC9C")]:
+        for text, color in [("History","#E0E0E0"), ("Export","#F1C40F"), ("Reset App","#E74C3C"),
+                            ("View Sales","#5DADE2"), ("View Expense","#1ABC9C")]:
             cammand = None
             if text == "History":
                 cammand = lambda: self.view_history_callback() if self.view_history_callback else None
@@ -115,7 +116,7 @@ class SalesView(ctk.CTkFrame):
         # load icon
         icon_path = os.path.join(os.path.dirname(__file__),
                                 "view_images",
-                                "admin_icon_white_png.png")
+                                "admin_icon_white.png")
         if os.path.exists(icon_path):
             admin_icon = CTkImage(Image.open(icon_path), size=(24,24))
         else:
@@ -153,12 +154,12 @@ class SalesView(ctk.CTkFrame):
             sales_frame,  # <- Important change
             values=barber_names,
             corner_radius=12,  # Rounded corners
-            fg_color="#1A1F2B",  # Background color of the dropdown
+            fg_color="#5DADE2",  # Background color of the dropdown
             width=300,  # Wider width for better look
             height= 40
         )
         self.barber_dropdown.set("Select Barber")
-        self.barber_dropdown.place(relx=0.4, rely=0.1, anchor="center")
+        self.barber_dropdown.place(relx=0.4, rely=0.2, anchor="center")
 
                 # 1a) Path to the services file (sits next to expense.json)
         self.services_path = os.path.join(os.path.dirname(__file__), "..", "services.json")
@@ -185,28 +186,28 @@ class SalesView(ctk.CTkFrame):
         self.service_type = ctk.CTkOptionMenu(
             sales_frame,
             values=list(self.service_prices.keys()),
-            fg_color="#1A1F2B",
+            fg_color="#5DADE2",
             corner_radius=12,
             width=300, height=30,
             command=self.on_service_selected
         )
         self.service_type.set("Select Service")
-        self.service_type.place(relx=0.4, rely=0.22, anchor="center")
+        self.service_type.place(relx=0.4, rely=0.3, anchor="center")
 
 
         # Amount entry
         self.amount_entry = ctk.CTkEntry(sales_frame, placeholder_text="e.g., 25.00", corner_radius=12, width=200)
-        self.amount_entry.place(relx=0.4, rely=0.34, anchor="center")
+        self.amount_entry.place(relx=0.4, rely=0.38, anchor="center")
       
         # Status label
         self.status_label = ctk.CTkLabel(sales_frame, text="", text_color="white")
-        self.status_label.place(relx=0.4, rely=0.42, anchor="center")
+        self.status_label.place(relx=0.4, rely=0.44, anchor="center")
 
         # Record Sale button
         self.record_btn = ctk.CTkButton(
             sales_frame, text="RECORD SALE", command=self.on_record_sale,
             font=ctk.CTkFont(size=16, weight="bold"), corner_radius=20, width=150, height=50,
-            fg_color="#4CAF50", hover_color="#45a049", text_color="white"
+            fg_color="#1ABC9C", hover_color="#45a049", text_color="white"
         )
         self.record_btn.place(relx=0.4, rely=0.52, anchor="center")
 
@@ -248,6 +249,7 @@ class SalesView(ctk.CTkFrame):
         win = self.admin_window
         win.title("Admin Panel")
         win.geometry("300x400+40+15")
+        win.resizable(False, False) # Fixed size
         win.transient(self)
         win.attributes("-topmost", True)
         win.focus_force()
@@ -635,6 +637,8 @@ class SalesView(ctk.CTkFrame):
                 sales_by_barber[name] = records
 
         lines = []
+        lines.append("SALES REPORT")
+        lines.append("")
         def sort_key(date_str):
             try:
                 return (0, datetime.strptime(date_str, "%A, %d/%m/%Y"))
@@ -670,7 +674,7 @@ class SalesView(ctk.CTkFrame):
                         except Exception:
                             date_key = raw
                 by_date.setdefault(date_key, []).append(r)
-
+  
             overall_total = 0.0
             for date_str in sorted(by_date.keys(), key=sort_key):
                 items = by_date[date_str]
@@ -738,6 +742,7 @@ class SalesView(ctk.CTkFrame):
         win = self.sales_window
         win.title("All Sales by Barber")
         win.geometry("500x600+15+20")
+        win.resizable(False, False)
 
         # Keep it on top of the main application window
         win.transient(self.master)
@@ -885,6 +890,7 @@ class SalesView(ctk.CTkFrame):
         win = self.expense_window
         win.title("View Expenses")
         win.geometry("700x600+15+20")
+        win.resizable(False, False)
         win.transient(self.master)
         win.attributes("-topmost", True)
 

@@ -15,7 +15,7 @@ if __name__ == "__main__":
     root.iconbitmap("sporkyicon.ico")
     # Determine initial window size based on existing data
     if os.path.exists(CONSTS.BARBER_TXT):
-        root.geometry("800x400+500+200")  # Larger size for sales UI
+        root.geometry("900x500+500+180")  # Larger size for sales UI
         root.resizable(True, True)
         root.minsize(750, 320)
         # Load existing barbers
@@ -24,8 +24,8 @@ if __name__ == "__main__":
         SalesController(root, barbers)
     else:
         # First run: go through setup
-        root.geometry("570x320+500+200")  # Compact size for setup UI
-        root.resizable(False, False),    
+        root.geometry("670x420+550+200")  # Compact size for setup UI
+        root.resizable(True, True),    
         SetupController(root)
 
     root.mainloop()
