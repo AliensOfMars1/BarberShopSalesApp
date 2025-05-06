@@ -84,6 +84,15 @@ class SalesView(ctk.CTkFrame):
         sep = ttk.Separator(self.sidebar, orient="horizontal")
         sep.pack(fill="x", pady=(0,10), padx=20)
 
+        # Load icons
+        icon_dir = os.path.join(os.path.dirname(__file__), "view_images", "icons")
+        icons = {
+            "History": CTkImage(Image.open(os.path.join(icon_dir, "history_icon.png")), size=(24, 24)),
+            "Export": CTkImage(Image.open(os.path.join(icon_dir, "export.png")), size=(24, 24)),
+            "Reset App": CTkImage(Image.open(os.path.join(icon_dir, "reset.png")), size=(24, 24)),
+            "View Sales": CTkImage(Image.open(os.path.join(icon_dir, "sales.png")), size=(24, 24)),
+            "View Expense": CTkImage(Image.open(os.path.join(icon_dir, "expense.png")), size=(24, 24)),
+        }
         # Buttons
         for text, color in [("History","#E0E0E0"), ("Export","#F1C40F"), ("Reset App","#E74C3C"),
                             ("View Sales","#5DADE2"), ("View Expense","#1ABC9C")]:
@@ -103,6 +112,8 @@ class SalesView(ctk.CTkFrame):
             btn = ctk.CTkButton(
                 self.sidebar,
                 text=text,
+                image=icons.get(text),
+                compound="left",
                 fg_color=color,
                 text_color="#1A1F2B" if color!="#E0E0E0" else "#1A1F2B",
                 corner_radius=8,
@@ -115,7 +126,7 @@ class SalesView(ctk.CTkFrame):
         # ─── Admin Button at bottom ────────────────────────────────
         # load icon
         icon_path = os.path.join(os.path.dirname(__file__),
-                                "view_images",
+                                "view_images", "icons",
                                 "admin_icon_white.png")
         if os.path.exists(icon_path):
             admin_icon = CTkImage(Image.open(icon_path), size=(24,24))
