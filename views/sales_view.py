@@ -35,7 +35,7 @@ class SalesView(ctk.CTkFrame):
 
 
         # Load the original image once
-        bg_path = os.path.join(os.path.dirname(__file__), "view_images", "app_bg.jpg") #"Mirage_view_bg.jpg", "app_bg.jpg"
+        bg_path = os.path.join(os.path.dirname(__file__), "view_images","background", "Mirage_view_bg.jpg") #"Mirage_view_bg.jpg", "app_bg.jpg"
         if os.path.exists(bg_path):
             # 1) Load and keep the PIL image
             self.original_bg_pil = Image.open(bg_path)
@@ -70,7 +70,7 @@ class SalesView(ctk.CTkFrame):
         #____________________________________________________________________________sidebar
 
         #Sidebar Base with Shadow
-        shadow = ctk.CTkFrame(self, width=330, fg_color="#0f131b", corner_radius=0)
+        shadow = ctk.CTkFrame(self, width=210, fg_color="#0f131b", corner_radius=0)
         shadow.place(x=0, y=0, relheight=1)
         self.sidebar = ctk.CTkFrame(self, fg_color="#1A1F2B", corner_radius=0)
         self.sidebar.place(x=5, y=4, relheight=0.98)
@@ -212,7 +212,7 @@ class SalesView(ctk.CTkFrame):
       
         # Status label
         self.status_label = ctk.CTkLabel(sales_frame, text="", text_color="white")
-        self.status_label.place(relx=0.4, rely=0.44, anchor="center")
+        self.status_label.place(relx=0.4, rely=0.455, anchor="center")
 
         # Record Sale button
         self.record_btn = ctk.CTkButton(
@@ -220,7 +220,7 @@ class SalesView(ctk.CTkFrame):
             font=ctk.CTkFont(size=16, weight="bold"), corner_radius=20, width=150, height=50,
             fg_color="#1ABC9C", hover_color="#45a049", text_color="white"
         )
-        self.record_btn.place(relx=0.4, rely=0.52, anchor="center")
+        self.record_btn.place(relx=0.4, rely=0.54, anchor="center")
 
 
     def on_service_selected(self, service_name):
@@ -250,10 +250,11 @@ class SalesView(ctk.CTkFrame):
 
     def open_admin_panel(self):
         # 1) Prevent multiple panels
+        # Toggle: if already open, close it
         if hasattr(self, "admin_window") and self.admin_window.winfo_exists():
-            self.admin_window.lift()
-            self.admin_window.focus_force()
+            self.admin_window.destroy()
             return
+
 
         # 2) Create the panel window
         self.admin_window = ctk.CTkToplevel(self)
@@ -271,20 +272,20 @@ class SalesView(ctk.CTkFrame):
 
         # 4) Define actions and pack buttons
         actions = [
+            ("Reset Data",     self.reset_data),
             ("Add Barber",     self.add_barber),
             ("Remove Barber",  self.remove_barber),   # ← NEW
             ("Add Service",    self.add_services),
             ("Remove Service", self.remove_service),
-            ("Remove Sale", self.remove_sale),
+            ("Delete Sale", self.remove_sale),
             ("Reset Password", self.reset_password),
-            ("Reset Data",     self.reset_data),
             ("Help",           self.show_help_window)
         ]
         for text, cmd in actions:
             btn = ctk.CTkButton(
                 panel,
                 text=text,
-                fg_color="#1A1F2B",
+                fg_color="#1ABC9C",
                 text_color="white",
                 corner_radius=8,
                 height=35,
@@ -893,14 +894,13 @@ class SalesView(ctk.CTkFrame):
     def on_view_expense(self):
         # — Prevent multiple windows —
         if hasattr(self, "expense_window") and self.expense_window.winfo_exists():
-            self.expense_window.lift()
-            self.expense_window.focus_force()
+            self.expense_window.destroy()
             return
 
         self.expense_window = ctk.CTkToplevel(self)
         win = self.expense_window
         win.title("View Expenses")
-        win.geometry("700x600+15+20")
+        win.geometry("700x600+820+30")
         win.resizable(False, False)
         win.transient(self.master)
         win.attributes("-topmost", True)
