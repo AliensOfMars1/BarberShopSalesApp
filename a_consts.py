@@ -1,5 +1,5 @@
 # Constants for the Barber Sales Recorder application
-
+import os 
 class CONSTS:
     # Constants for the application
     APP_NAME = "Sporky Barbers - Sales Recoder"
@@ -11,6 +11,8 @@ class CONSTS:
     BARBER_JSON_TMPL = "{}.json"
     BARBER_JSON     = "barbers.json"
     EXPENSES_JSON = "expenses.json"
+    CREDENTIALS_JSON = os.path.join(os.path.dirname(__file__), "credentials.json")
+
     HELP_TEXT = """
         Welcome to BarberApp Help!
 

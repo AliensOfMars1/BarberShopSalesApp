@@ -24,7 +24,7 @@ if __name__ == "__main__":
         SalesController(root, barbers)
     else:
         # First run: go through setup
-        root.geometry("690x450+530+200")  # Compact size for setup UI
+        root.geometry("900x500+520+120")  # Compact size for setup UI     "690x450+530+200"
         root.resizable(True, True),    
         SetupController(root)
 

@@ -16,9 +16,15 @@ from PIL import Image
 
 
 class SalesView(ctk.CTkFrame):
-    def __init__(self, master, barber_names, record_callback, reset_callback,
-                  view_history_callback=None, export_callback = None, 
-                  view_expenses_callback=None, view_sales_callback=None):
+    def __init__(self, master, barber_names,
+                record_callback, reset_callback,
+                view_history_callback=None, 
+                export_callback = None, 
+                view_expenses_callback=None,
+                view_sales_callback=None,
+                reset_password_callback=None, 
+                verify_admin_callback=None
+                ): 
         """
         Initialize the SalesView with a master window and callbacks for actions. """
         
@@ -31,7 +37,8 @@ class SalesView(ctk.CTkFrame):
         self.barber_names = barber_names
         self.view_expenses_callback = view_expenses_callback # Placeholder for view expenses callback
         self.view_sales_callback = view_sales_callback # Placeholder for view sales callback
-
+        self.reset_password_callback = reset_password_callback
+        self.verify_admin_callback = verify_admin_callback
 
 
         # Load the original image once
@@ -242,6 +249,7 @@ class SalesView(ctk.CTkFrame):
         self.after(2000, lambda: self.status_label.configure(text=""))
 
     def update_barber_names(self, barber_names):
+        self.barber_names = barber_names
         self.barber_dropdown.configure(values=barber_names)
         self.barber_dropdown.set("Select Barber")
     
@@ -406,7 +414,7 @@ class SalesView(ctk.CTkFrame):
             show="*",
             parent=self.admin_window
         )
-        if pwd != "@1234":   # must match your admin pass
+        if not self.verify_admin_callback(pwd):   # must match your admin pass
             messagebox.showerror(
                 "Denied",
                 "Incorrect password—action cancelled.",
@@ -561,9 +569,63 @@ class SalesView(ctk.CTkFrame):
         if hasattr(self, "sales_window") and self.sales_window.winfo_exists():
             self.view_sales()
 
+
     def reset_password(self):
-        print("reset password clicked")
-        # TODO: implement settings dialog
+        # If already open, bring to front
+        if hasattr(self, "_pw_window") and self._pw_window.winfo_exists():
+            self._pw_window.lift()
+            return
+
+        dlg = ctk.CTkToplevel(self)
+        dlg.title("Reset Password")
+        dlg.geometry("350x250")
+        dlg.resizable(False, False)
+        dlg.attributes("-topmost", True)
+        dlg.transient(self)
+        dlg.grab_set()
+
+        # Entries for current, new, confirm
+
+        ctk.CTkLabel(dlg, text="Current Password:").pack()
+        current_ent = ctk.CTkEntry(dlg, show="*")
+        current_ent.pack(pady=(0,10))
+
+        ctk.CTkLabel(dlg, text="New Password:").pack()
+        new_ent = ctk.CTkEntry(dlg, show="*")
+        new_ent.pack(pady=(0,10))
+
+        ctk.CTkLabel(dlg, text="Confirm New Password:").pack()
+        confirm_ent = ctk.CTkEntry(dlg, show="*")
+        confirm_ent.pack(pady=(0,15))
+
+        def on_ok():
+            cur  = current_ent.get()
+            new  = new_ent.get()
+            conf = confirm_ent.get()
+
+            if not (cur and new and conf):
+                messagebox.showerror("Error", "All fields are required.", parent=dlg)
+                return
+
+            if new != conf:
+                messagebox.showerror("Error", "New passwords don't match.", parent=dlg)
+                return
+
+            # delegate to controller
+            success = self.reset_password_callback(cur, new)
+            if success:
+                messagebox.showinfo("Success", "Password changed!", parent=dlg)
+                dlg.destroy()
+            else:
+                messagebox.showerror("Error", "Current password incorrect.", parent=dlg)
+
+        btn_frame = ctk.CTkFrame(dlg, fg_color="transparent")
+        btn_frame.pack(pady=(0,10))
+        ctk.CTkButton(btn_frame, text="OK", command=on_ok, width=80).pack(side="left", padx=10)
+        ctk.CTkButton(btn_frame, text="Cancel", command=dlg.destroy, width=80).pack(side="left")
+
+        self._pw_window = dlg
+
 
     def reset_data(self):
         from tkinter import messagebox
@@ -577,7 +639,7 @@ class SalesView(ctk.CTkFrame):
         )
         if pwd is None:
             return   # user cancelled
-        if pwd != "@1234":   # match your real admin password
+        if not self.verify_admin_callback(pwd):   # match your real admin password
             messagebox.showerror(
                 "Denied",
                 "Incorrect password—reset cancelled.",
@@ -724,14 +786,14 @@ class SalesView(ctk.CTkFrame):
             for r in recs:
                 amt = float(r.get("amount", 0))
                 all_barbers_overall_total += amt
-        lines.append(f" Overall Total Sales: GHS{all_barbers_overall_total:.2f}")
+        lines.append(f"Overall Total Sales: GHS{all_barbers_overall_total:.2f}")
         lines.append("")
         overall_commission = all_barbers_overall_total / 3.0
-        lines.append(f" Overall Commission : GHS{overall_commission:.2f}")
+        lines.append(f"Overall Commission Paid : GHS{overall_commission:.2f}")
         lines.append("")
-        lines.append(f" Total expenses : GHS{total_expense:.2f}")
+        lines.append(f"Total expenses Made : GHS{total_expense:.2f}")
         lines.append("")
-        lines.append(f" Total Amount left : GHS{(all_barbers_overall_total -( total_expense + overall_commission)):.2f}")    
+        lines.append(f"Total Amount left : GHS{(all_barbers_overall_total -( total_expense + overall_commission)):.2f}")    
 
         return "\n".join(lines) if lines else "No sales data found."
 

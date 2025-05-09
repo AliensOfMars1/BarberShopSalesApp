@@ -31,7 +31,10 @@ class SalesController:
             reset_callback=self.reset_app,
             export_callback=self.export,
             view_expenses_callback=self.view_expenses,
-            view_sales_callback = self.view_sales
+            view_sales_callback = self.view_sales,
+            reset_password_callback=self.reset_password,
+            verify_admin_callback=self.verify_admin
+
         )
         self.frame.pack(fill="both", expand=True)
 
@@ -118,21 +121,22 @@ class SalesController:
 
 
     def reset_app(self):
-
         # Prompt for admin credentials via custom dialog
         username, password = self.ask_admin_credentials()
         if not username or not password:
             return
-        # Verify credentials via model
         if not self.model.verify_admin(username, password):
             messagebox.showerror("Authentication Failed", "Invalid admin credentials.")
             return
 
         # Confirm reset
-        if not messagebox.askyesno("Confirm Reset", "This will erase all data and close the app. Continue?"):
+        if not messagebox.askyesno(
+            "Confirm Reset",
+            "This will erase ALL data (barbers, sales, AND expenses) and close the app. Continue?"
+        ):
             return
 
-        # Delete persisted barber data
+        # 1) Delete barber persistence
         for path in (CONSTS.BARBER_TXT, CONSTS.ALL_JSON):
             try:
                 os.remove(path)
@@ -144,12 +148,33 @@ class SalesController:
             except OSError:
                 pass
 
-        # Clear in-memory sales log
+        # 2) Clear in-memory sales log
         self.model.sales_log.clear()
 
-        # Close the application immediately
+        # 3) **Clear the expenses file****
+        import json
+        exp_path = os.path.join(os.path.dirname(__file__), "..", "expense.json")
+        try:
+            with open(exp_path, "w", encoding="utf-8") as f:
+                json.dump([], f, indent=2)
+        except Exception as e:
+            # If you want, show a warning but still proceed
+            print(f"Warning: failed to clear expenses: {e}")
+
+                # 4) Reset admin password back to default
+        creds_path = CONSTS.CREDENTIALS_JSON
+        try:
+            # delete the file so model will recreate it with default on next run
+            if os.path.exists(creds_path):
+                os.remove(creds_path)
+
+        except Exception as e:
+            print(f"Warning: couldn't reset credentials file: {e}")    
+
+        # 5) Close the application
         self.frame.destroy()
         self.root.destroy()
+
 
     def export(self):
         # delegate straight back to the view’s export code
@@ -168,9 +193,16 @@ class SalesController:
         self.barber_names = barber_names
         self.frame.update_barber_names(barber_names)
 
+    def verify_admin(self, password):
+        #always "admin"
+        return self.model.verify_admin("admin", password)
+       
 
+    def reset_password(self, current_pw, new_pw):
+        # Ask the model to change it
+        changed = self.model.change_password("admin", current_pw, new_pw)
+        return changed        
 
-      
 
 
     

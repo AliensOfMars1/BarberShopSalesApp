@@ -11,7 +11,7 @@ class SetupView(ctk.CTkFrame):
 
         # ───── Left: image covers 50% width with 5% margin on each edge ─────
         img_frame = ctk.CTkFrame(self,corner_radius=0, fg_color="#2A9D8F")
-        img_frame.place(relx=0, rely=0, relwidth=0.5, relheight=1)
+        img_frame.place(relx=0, rely=0, relwidth=0.51, relheight=1)
         img_frame.pack_propagate(False)
 
         bg_path = os.path.join(
@@ -44,11 +44,12 @@ class SetupView(ctk.CTkFrame):
         # Barber names
         ctk.CTkLabel(
             form,
-            text="To Setup The\nApplication\n\nEnter Barber Names\n(comma-separated)",
+            text="To Setup This\nApplication\n\nEnter Barber Name(s)\n(comma-separated)",
             font=ctk.CTkFont(size=18, weight="bold"),
             text_color="white",
+            wraplength=300 ,
             justify="left"
-        ).pack(anchor="w", pady=(120, 16), padx=75)
+        ).pack(anchor="w", pady=(120, 16), padx=125)
 
         self.entry = ctk.CTkEntry(
             form,
@@ -56,7 +57,8 @@ class SetupView(ctk.CTkFrame):
             fg_color="#333333", text_color="white",
             width=240,height=40 , corner_radius=8
         )
-        self.entry.pack(anchor="w", pady=(0,30), padx=70)
+        self.entry.pack(anchor="w", pady=(0,30), padx=120)
+
 
         # Proceed button
         self.proceed_btn = ctk.CTkButton(
@@ -68,7 +70,7 @@ class SetupView(ctk.CTkFrame):
             fg_color="#4CAF50", hover_color="#45a049",
             font=ctk.CTkFont(size=16, weight="bold")
         )
-        self.proceed_btn.pack(anchor="w", padx=95)
+        self.proceed_btn.pack(anchor="w", padx=150)
 
     def on_proceed(self):
         names = [n.strip() for n in self.entry.get().split(",") if n.strip()]
