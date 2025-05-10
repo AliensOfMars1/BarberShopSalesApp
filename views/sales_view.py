@@ -16,9 +16,15 @@ from PIL import Image
 
 
 class SalesView(ctk.CTkFrame):
-    def __init__(self, master, barber_names, record_callback, reset_callback,
-                  view_history_callback=None, export_callback = None, 
-                  view_expenses_callback=None, view_sales_callback=None):
+    def __init__(self, master, barber_names,
+                record_callback, reset_callback,
+                view_history_callback=None, 
+                export_callback = None, 
+                view_expenses_callback=None,
+                view_sales_callback=None,
+                reset_password_callback=None, 
+                verify_admin_callback=None
+                ): 
         """
         Initialize the SalesView with a master window and callbacks for actions. """
         
@@ -31,22 +37,23 @@ class SalesView(ctk.CTkFrame):
         self.barber_names = barber_names
         self.view_expenses_callback = view_expenses_callback # Placeholder for view expenses callback
         self.view_sales_callback = view_sales_callback # Placeholder for view sales callback
-
+        self.reset_password_callback = reset_password_callback
+        self.verify_admin_callback = verify_admin_callback
 
 
         # Load the original image once
-        bg_path = os.path.join(os.path.dirname(__file__), "view_images", "app_bg.jpg") #"Mirage_view_bg.jpg", "app_bg.jpg"
+        bg_path = os.path.join(os.path.dirname(__file__), "view_images","background", "Mirage_view_bg.jpg") #"Mirage_view_bg.jpg", "app_bg.jpg"
         if os.path.exists(bg_path):
-            # 1) Load and keep the PIL image
+            # 1). Load and keep the PIL image
             self.original_bg_pil = Image.open(bg_path)
-            # 2) Create an initial CTkImage sized to the current window
+            # 2). Create an initial CTkImage sized to the current window
             init_w, init_h = self.winfo_width() or 800, self.winfo_height() or 400
             self.bg_ctk_image = CTkImage(self.original_bg_pil, size=(init_w, init_h))
-            # 3) Place it
+            # 3). Place it
             self.bg_label = ctk.CTkLabel(self, image=self.bg_ctk_image, text="")
             self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-            # 4) Define a resize callback
+            # 4). Define a resize callback
             def update_background(event=None):
                 w, h = self.winfo_width(), self.winfo_height()
                 # Resize the PIL image
@@ -56,7 +63,7 @@ class SalesView(ctk.CTkFrame):
                 # Update the label
                 self.bg_label.configure(image=self.bg_ctk_image)
 
-            # 5) Bind it and call once
+            # 5). Bind it and call once
             update_background()
             self.bind("<Configure>", update_background)
 
@@ -70,7 +77,7 @@ class SalesView(ctk.CTkFrame):
         #____________________________________________________________________________sidebar
 
         #Sidebar Base with Shadow
-        shadow = ctk.CTkFrame(self, width=330, fg_color="#0f131b", corner_radius=0)
+        shadow = ctk.CTkFrame(self, width=210, fg_color="#0f131b", corner_radius=0)
         shadow.place(x=0, y=0, relheight=1)
         self.sidebar = ctk.CTkFrame(self, fg_color="#1A1F2B", corner_radius=0)
         self.sidebar.place(x=5, y=4, relheight=0.98)
@@ -212,7 +219,7 @@ class SalesView(ctk.CTkFrame):
       
         # Status label
         self.status_label = ctk.CTkLabel(sales_frame, text="", text_color="white")
-        self.status_label.place(relx=0.4, rely=0.44, anchor="center")
+        self.status_label.place(relx=0.4, rely=0.455, anchor="center")
 
         # Record Sale button
         self.record_btn = ctk.CTkButton(
@@ -220,7 +227,7 @@ class SalesView(ctk.CTkFrame):
             font=ctk.CTkFont(size=16, weight="bold"), corner_radius=20, width=150, height=50,
             fg_color="#1ABC9C", hover_color="#45a049", text_color="white"
         )
-        self.record_btn.place(relx=0.4, rely=0.52, anchor="center")
+        self.record_btn.place(relx=0.4, rely=0.54, anchor="center")
 
 
     def on_service_selected(self, service_name):
@@ -242,6 +249,7 @@ class SalesView(ctk.CTkFrame):
         self.after(2000, lambda: self.status_label.configure(text=""))
 
     def update_barber_names(self, barber_names):
+        self.barber_names = barber_names
         self.barber_dropdown.configure(values=barber_names)
         self.barber_dropdown.set("Select Barber")
     
@@ -250,10 +258,11 @@ class SalesView(ctk.CTkFrame):
 
     def open_admin_panel(self):
         # 1) Prevent multiple panels
+        # Toggle: if already open, close it
         if hasattr(self, "admin_window") and self.admin_window.winfo_exists():
-            self.admin_window.lift()
-            self.admin_window.focus_force()
+            self.admin_window.destroy()
             return
+
 
         # 2) Create the panel window
         self.admin_window = ctk.CTkToplevel(self)
@@ -271,20 +280,20 @@ class SalesView(ctk.CTkFrame):
 
         # 4) Define actions and pack buttons
         actions = [
+            ("Reset Data",     self.reset_data),
             ("Add Barber",     self.add_barber),
             ("Remove Barber",  self.remove_barber),   # ← NEW
             ("Add Service",    self.add_services),
             ("Remove Service", self.remove_service),
-            ("Remove Sale", self.remove_sale),
+            ("Delete Sale", self.remove_sale),
             ("Reset Password", self.reset_password),
-            ("Reset Data",     self.reset_data),
             ("Help",           self.show_help_window)
         ]
         for text, cmd in actions:
             btn = ctk.CTkButton(
                 panel,
                 text=text,
-                fg_color="#1A1F2B",
+                fg_color="#1ABC9C",
                 text_color="white",
                 corner_radius=8,
                 height=35,
@@ -405,7 +414,7 @@ class SalesView(ctk.CTkFrame):
             show="*",
             parent=self.admin_window
         )
-        if pwd != "@1234":   # must match your admin pass
+        if not self.verify_admin_callback(pwd):   # must match your admin pass
             messagebox.showerror(
                 "Denied",
                 "Incorrect password—action cancelled.",
@@ -560,9 +569,63 @@ class SalesView(ctk.CTkFrame):
         if hasattr(self, "sales_window") and self.sales_window.winfo_exists():
             self.view_sales()
 
+
     def reset_password(self):
-        print("reset password clicked")
-        # TODO: implement settings dialog
+        # If already open, bring to front
+        if hasattr(self, "_pw_window") and self._pw_window.winfo_exists():
+            self._pw_window.lift()
+            return
+
+        dlg = ctk.CTkToplevel(self)
+        dlg.title("Reset Password")
+        dlg.geometry("350x250")
+        dlg.resizable(False, False)
+        dlg.attributes("-topmost", True)
+        dlg.transient(self)
+        dlg.grab_set()
+
+        # Entries for current, new, confirm
+
+        ctk.CTkLabel(dlg, text="Current Password:").pack()
+        current_ent = ctk.CTkEntry(dlg, show="*")
+        current_ent.pack(pady=(0,10))
+
+        ctk.CTkLabel(dlg, text="New Password:").pack()
+        new_ent = ctk.CTkEntry(dlg, show="*")
+        new_ent.pack(pady=(0,10))
+
+        ctk.CTkLabel(dlg, text="Confirm New Password:").pack()
+        confirm_ent = ctk.CTkEntry(dlg, show="*")
+        confirm_ent.pack(pady=(0,15))
+
+        def on_ok():
+            cur  = current_ent.get()
+            new  = new_ent.get()
+            conf = confirm_ent.get()
+
+            if not (cur and new and conf):
+                messagebox.showerror("Error", "All fields are required.", parent=dlg)
+                return
+
+            if new != conf:
+                messagebox.showerror("Error", "New passwords don't match.", parent=dlg)
+                return
+
+            # delegate to controller
+            success = self.reset_password_callback(cur, new)
+            if success:
+                messagebox.showinfo("Success", "Password changed!", parent=dlg)
+                dlg.destroy()
+            else:
+                messagebox.showerror("Error", "Current password incorrect.", parent=dlg)
+
+        btn_frame = ctk.CTkFrame(dlg, fg_color="transparent")
+        btn_frame.pack(pady=(0,10))
+        ctk.CTkButton(btn_frame, text="OK", command=on_ok, width=80).pack(side="left", padx=10)
+        ctk.CTkButton(btn_frame, text="Cancel", command=dlg.destroy, width=80).pack(side="left")
+
+        self._pw_window = dlg
+
 
     def reset_data(self):
         from tkinter import messagebox
@@ -576,7 +639,7 @@ class SalesView(ctk.CTkFrame):
         )
         if pwd is None:
             return   # user cancelled
-        if pwd != "@1234":   # match your real admin password
+        if not self.verify_admin_callback(pwd):   # match your real admin password
             messagebox.showerror(
                 "Denied",
                 "Incorrect password—reset cancelled.",
@@ -723,14 +786,14 @@ class SalesView(ctk.CTkFrame):
             for r in recs:
                 amt = float(r.get("amount", 0))
                 all_barbers_overall_total += amt
-        lines.append(f" Overall Total Sales: GHS{all_barbers_overall_total:.2f}")
+        lines.append(f"Overall Total Sales: GHS{all_barbers_overall_total:.2f}")
         lines.append("")
         overall_commission = all_barbers_overall_total / 3.0
-        lines.append(f" Overall Commission : GHS{overall_commission:.2f}")
+        lines.append(f"Overall Commission Paid : GHS{overall_commission:.2f}")
         lines.append("")
-        lines.append(f" Total expenses : GHS{total_expense:.2f}")
+        lines.append(f"Total expenses Made : GHS{total_expense:.2f}")
         lines.append("")
-        lines.append(f" Total Amount left : GHS{(all_barbers_overall_total -( total_expense + overall_commission)):.2f}")    
+        lines.append(f"Total Amount left : GHS{(all_barbers_overall_total -( total_expense + overall_commission)):.2f}")    
 
         return "\n".join(lines) if lines else "No sales data found."
 
@@ -776,6 +839,7 @@ class SalesView(ctk.CTkFrame):
         win = self.help_window
         win.title("Help")
         win.geometry("630x500+200+40")
+        win.resizable(False, False)
         win.transient(admin_window := self.admin_window if hasattr(self, "admin_window") else self.master)
         win.attributes("-topmost", True)
         win.focus_force()
@@ -893,14 +957,13 @@ class SalesView(ctk.CTkFrame):
     def on_view_expense(self):
         # — Prevent multiple windows —
         if hasattr(self, "expense_window") and self.expense_window.winfo_exists():
-            self.expense_window.lift()
-            self.expense_window.focus_force()
+            self.expense_window.destroy()
             return
 
         self.expense_window = ctk.CTkToplevel(self)
         win = self.expense_window
         win.title("View Expenses")
-        win.geometry("700x600+15+20")
+        win.geometry("700x600+820+30")
         win.resizable(False, False)
         win.transient(self.master)
         win.attributes("-topmost", True)

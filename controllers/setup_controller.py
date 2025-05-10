@@ -38,7 +38,9 @@ class SetupController:
         # Tear down setup UI
         self.frame.pack_forget()
         # Resize and launch sales
-        self.root.geometry("800x400")
+        self.root.geometry("900x550+520+80")  
+        self.root.resizable(True, True)
+        self.root.minsize(750, 320)
         SalesController(self.root, barber_names)
 
 
