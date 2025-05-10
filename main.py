@@ -15,7 +15,7 @@ if __name__ == "__main__":
     root.iconbitmap("sporkyicon.ico")
     # Determine initial window size based on existing data
     if os.path.exists(CONSTS.BARBER_TXT):
-        root.geometry("900x500+520+120")  # Larger size for sales UI
+        root.geometry("900x550+520+80")  # Larger size for sales UI
         root.resizable(True, True)
         root.minsize(750, 320)
         # Load existing barbers

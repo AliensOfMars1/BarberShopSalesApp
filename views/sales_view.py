@@ -44,16 +44,16 @@ class SalesView(ctk.CTkFrame):
         # Load the original image once
         bg_path = os.path.join(os.path.dirname(__file__), "view_images","background", "Mirage_view_bg.jpg") #"Mirage_view_bg.jpg", "app_bg.jpg"
         if os.path.exists(bg_path):
-            # 1) Load and keep the PIL image
+            # 1). Load and keep the PIL image
             self.original_bg_pil = Image.open(bg_path)
-            # 2) Create an initial CTkImage sized to the current window
+            # 2). Create an initial CTkImage sized to the current window
             init_w, init_h = self.winfo_width() or 800, self.winfo_height() or 400
             self.bg_ctk_image = CTkImage(self.original_bg_pil, size=(init_w, init_h))
-            # 3) Place it
+            # 3). Place it
             self.bg_label = ctk.CTkLabel(self, image=self.bg_ctk_image, text="")
             self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-            # 4) Define a resize callback
+            # 4). Define a resize callback
             def update_background(event=None):
                 w, h = self.winfo_width(), self.winfo_height()
                 # Resize the PIL image
@@ -63,7 +63,7 @@ class SalesView(ctk.CTkFrame):
                 # Update the label
                 self.bg_label.configure(image=self.bg_ctk_image)
 
-            # 5) Bind it and call once
+            # 5). Bind it and call once
             update_background()
             self.bind("<Configure>", update_background)
 
@@ -839,6 +839,7 @@ class SalesView(ctk.CTkFrame):
         win = self.help_window
         win.title("Help")
         win.geometry("630x500+200+40")
+        win.resizable(False, False)
         win.transient(admin_window := self.admin_window if hasattr(self, "admin_window") else self.master)
         win.attributes("-topmost", True)
         win.focus_force()
